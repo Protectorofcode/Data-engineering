@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS users;
-CREATE TABLE catalogs (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) COMMENT 'Name'
 ) COMMENT = 'Simple table';
