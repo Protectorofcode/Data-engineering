@@ -1,0 +1,51 @@
+1. Проанализировать структуру БД vk, которую мы создали на занятии, и внести предложения по усовершенствованию (если такие идеи есть). Напишите пожалуйста, всё-ли понятно по структуре.
+
+-- 1. Создать отдельную таблицу для стран.
+	
+	-- Таблица стран
+	CREATE TABLE countries (
+  	 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  	 name VARCHAR(100) NOT NULL COMMENT "Название страны",
+  	 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  	 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+	) COMMENT "Страны";  
+
+-- 2. Создать отдельную таблицу для городов.
+
+	-- Таблица стран
+	CREATE TABLE cities (
+  	 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  	 name VARCHAR(100) NOT NULL COMMENT "Название города",
+  	 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  	 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+	) COMMENT "Города"; 
+
+-- 3. Создать отдельную таблицу для статусов.
+
+ 	-- Таблица статусов пользователей
+	CREATE TABLE user_status (
+  	 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  	 name VARCHAR(100) NOT NULL COMMENT "Название статуса (уникально)",
+  	 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  	 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+	) COMMENT "Статусы пользователей";  
+
+
+-- INSERT INTO user_statuses (name) VALUES ('single'),('married');
+-- ALTER TABLE profiles RENAME COLUMN status TO status_id;
+-- ALTER TABLE profiles MODIFY COLUMN status_id INT UNSIGNED;
+
+
+
+2. Добавить необходимую таблицу/таблицы для того, чтобы можно было использовать лайки для медиафайлов, постов и пользователей.
+
+-- Таблица лайков
+CREATE TABLE messages (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  from_user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на отправителя лайка",
+  to_recipient_id INT UNSIGNED NOT NULL COMMENT "Ссылка на получателя лайка",
+  created_at DATETIME NOT NULL DEFAULT NOW() COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Лайки";
+
+
