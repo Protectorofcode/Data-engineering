@@ -1,0 +1,164 @@
+--Практическое задание по теме «Операторы, фильтрация, сортировка и ограничение»
+
+
+-- 1. Пусть в таблице users поля created_at и updated_at оказались незаполненными. Заполните их текущими датой и временем.
+
+--Заполним некоторые экземпляры некорректными данными
+UPDATE users SET created_at = '1900-11-13 10:12:00' where id = 3;
+UPDATE users SET updated_at = '1900-11-13 10:12:00' where id = 3;
+
+UPDATE users SET created_at = '1900-11-13 10:12:00' where id = 4;
+UPDATE users SET updated_at = '1900-11-13 10:12:00' where id = 4;
+
+--Заполняем некорректные данные текущими датой и временем
+UPDATE users SET created_at = NOW() where created_at = '1900-11-13 10:12:00';
+UPDATE users SET updated_at = NOW() where created_at = '1900-11-13 10:12:00';
+
+
+
+
+
+--2. Таблица users была неудачно спроектирована. Записи created_at и updated_at были заданы типом VARCHAR и в них долгое время помещались значения в формате 20.10.2017 8:10. 
+--Необходимо преобразовать поля к типу DATETIME, сохранив введённые ранее значения.
+
+ALTER TABLE users
+    CHANGE COLUMN created_at created_at VARCHAR(256) NULL,
+    CHANGE COLUMN updated_at updated_at VARCHAR(256) NULL;
+
+describe users;
+
+ALTER TABLE users
+    CHANGE COLUMN created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CHANGE COLUMN updated_at updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+describe users;
+
+
+
+
+
+-- 3. В таблице складских запасов storehouses_products в поле value могут встречаться самые разные цифры: 0,
+-- если товар закончился и выше нуля, если на складе имеются запасы. Необходимо отсортировать записи таким образом,
+-- чтобы они выводились в порядке увеличения значения value. Нулевые запасы должны выводиться в конце, после всех записей.
+
+
+create temporary table storehouses_products (
+	id SERIAL PRIMARY KEY,
+    storehouse_id INT unsigned,
+    product_id INT unsigned,
+    value INT unsigned
+) COMMENT = 'Запасы на складе';
+
+
+INSERT INTO
+    storehouses_products (storehouse_id, product_id, value)
+VALUES
+    (1, 1, 100),
+    (1, 2, 32),
+    (2, 3, 0),
+    (2, 4, 2),
+    (3, 5, 0);
+
+
+SELECT value FROM storehouses_products ORDER BY CASE WHEN value = 0 then 1 else 0 end, value;
+
+--Ответ показан в 3_task.png
+
+
+
+
+
+-- 4. (по желанию) Из таблицы users необходимо извлечь пользователей, родившихся в августе и мае.
+-- Месяцы заданы в виде списка английских названий ('may', 'august')
+
+SELECT first_name, birthday FROM profiles join users on users.id = profiles.user_id where MONTHNAME(birthday) in ('may', 'august');
+
+--Ответ показан в 4_task.png
+
+
+
+-- 5. (по желанию) Из таблицы catalogs извлекаются записи при помощи запроса:
+-- SELECT * FROM catalogs WHERE id IN (5, 1, 2); Отсортируйте записи в порядке, заданном в списке IN.
+
+
+create temporary table catalogs (
+    id SERIAL PRIMARY KEY,
+    value INT unsigned
+) COMMENT = 'Каталоги';
+
+
+INSERT INTO catalogs (value)
+VALUES
+    (1),
+    (2),
+    (3),
+    (4),
+    (5),
+    (3),
+    (4),
+    (1),
+    (4),
+    (2),
+    (2),
+    (2);
+
+
+SELECT * FROM catalogs WHERE value IN (5, 1, 2) ORDER BY CASE WHEN value=5 THEN 0 WHEN value=1 THEN 1 WHEN value=2 THEN 2 END;	
+
+--Ответ показан в 5_task.png
+
+
+
+
+
+
+--Практическое задание теме «Агрегация данных»
+
+--В нашей таблице users нет поля возраст, поэтому создадим временную таблицу с возрастом для примера
+--1.Подсчитайте средний возраст пользователей в таблице users.
+
+create temporary table users2 (
+  id SERIAL PRIMARY KEY,
+  name varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Имя пользователя',
+  age int unsigned DEFAULT NULL COMMENT 'Возраст'
+);	
+
+INSERT INTO users2 (name, age)
+VALUES
+    ('Анна', 25),
+    ('Дмитрий', 24),
+    ('Виктор', 29),
+    ('Ксения', 22),
+    ('Виталий', 31),
+    ('Роман', 34),
+    ('Юлия', 38),
+    ('Полина', 45),
+    ('Андрей', 49),
+    ('Георгий', 53);
+
+
+SELECT AVG(age) FROM users2;
+
+
+--Ниже не мое решение, но оно мне понравилось. И думаю это правильное решение. Решил оставить его здесь.
+SELECT AVG(age) FROM (SELECT YEAR(CURRENT_TIMESTAMP) - YEAR(birthday) as age FROM profiles) AS Avg_age;
+
+--Ответ показан в 1_aggTask.png
+
+
+--2. Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели. Следует учесть, что необходимы дни недели текущего года, а не года рождения
+SELECT COUNT(*) from (SELECT DAYOFWEEK(CONCAT(YEAR(NOW()),'-',MONTH(birthday),'-',DAYOFMONTH(birthday))) as date1 from profiles) as stats where date1=1;
+-- где date1=1 для понедельника, date1=2 для вторника и т.д
+
+--Ответ показан в 2_aggTask.png
+
+
+-- 3) Подсчитайте произведение чисел в столбце таблицы
+
+select exp(sum(ln(age))) from users2;
+--Нужно помнить, что логарифм произведения равен сумме логарифмов. 
+--От каждого значения в поле age таблицы users2 берётся натуральный логарифм, затем считается сумма этих логарифмов и затем экспонента возводится в степень, 
+--равную этой сумме.
+
+--Ответ показан в 3_aggTask.png
+
