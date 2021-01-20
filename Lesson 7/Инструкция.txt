@@ -1,0 +1,59 @@
+-- Сложные запросы
+
+
+-- 1. Составьте список пользователей users, которые осуществили хотя бы один заказ orders в интернет магазине
+
+SELECT DISTINCT name FROM users JOIN orders ON users.id=orders.user_id;
+
+
+
+--2. Выведите список товаров products и разделов catalogs, который соответствует товару.
+
+SELECT products.name, catalogs.name FROM products LEFT JOIN catalogs ON products.catalog_id = catalogs.id;
+
+
+-- Ответ показан в 2.png
+
+
+
+
+-- 3. Пусть имеется таблица рейсов flights (id, from, to) и таблица городов cities (label, name). 
+-- Поля from, to и label содержат английские названия городов, поле name — русское. 
+-- Выведите список рейсов flights с русскими названиями городов
+
+
+CREATE TABLE flights (
+  id SERIAL PRIMARY KEY,
+  from_ VARCHAR(255),
+  to_ VARCHAR(255)
+);
+
+CREATE TABLE cities (
+  label VARCHAR(255),
+  name VARCHAR(255)
+);
+
+INSERT INTO flights VALUES
+  (1, 'moscow', 'omsk'),
+  (2, 'novgorod', 'kazan'),
+  (3, 'irkutsk', 'moscow'),
+  (4, 'omsk', 'irkutsk'),
+  (5, 'moscow', 'kazan');
+
+INSERT INTO cities VALUES
+  ('moscow', 'Москва'),
+  ('irkutsk', 'Иркутск'),
+  ('novgorod', 'Новгород'),
+  ('kazan', 'Казань'),
+  ('omsk', 'Омск');
+
+SELECT flights.id, cities.name, c.name FROM flights LEFT JOIN cities ON cities.label=flights.from_
+	LEFT JOIN cities as c ON c.label = flights.to_;
+
+
+-- Ответ показан в 3.png
+
+
+
+
+
