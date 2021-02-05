@@ -1,0 +1,49 @@
+-- Транзакции, переменные, представления. Администрирование. Хранимые процедуры и функции, триггеры
+
+
+-- 1. Проанализировать какие запросы могут выполняться наиболее часто в процессе работы приложения и добавить необходимые индексы
+
+-- Ищут пользователей по имени и фамилии
+CREATE INDEX first_last_name_idx ON users(first_name, last_name);
+
+-- Часто ищут пользователей по телефону или email
+CREATE INDEX users_email_idx ON users(email);
+CREATE INDEX users_phone_idx ON users(phone);
+
+-- Также могут искать пользователей по городу их проживания
+CREATE INDEX profiles_city_idx ON profiles(city);
+
+-- Можно искать необходимую информацию в сообщениях или постах
+CREATE INDEX messages_body_idx ON messages(body(10));
+CREATE INDEX posts_body_idx ON posts(body(10));
+
+-- Можно искать группы по их названию
+CREATE INDEX communities_idx ON communities(name);
+
+
+
+-- 2. Задание на оконные функции
+-- Построить запрос, который будет выводить следующие столбцы: -- имя группы -- среднее количество пользователей 
+-- в группах -- самый молодой пользователь в группе -- самый старший пользователь в группе -- общее количество пользователей
+-- в группе -- всего пользователей в системе -- отношение в процентах 
+-- (общее количество пользователей в группе / всего пользователей в системе) * 100
+
+
+
+SELECT DISTINCT communities.name,
+	AVG(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) AS average,
+	MIN(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS min_1,
+	MAX(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS max_1,
+	COUNT(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) AS count_1,
+	COUNT(profiles.user_id) OVER() AS all_users,
+	SUM(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) / SUM(profiles.user_id) OVER() * 100 AS "%%"
+	FROM communities
+      		JOIN communities_users
+        		ON communities.id = communities_users.community_id
+        	JOIN profiles
+        		ON communities_users.user_id = profiles.user_id;
+
+
+--Ответ показан в 2.png
+
+

@@ -1,0 +1,213 @@
+1. Проанализировать структуру БД vk, которую мы создали на занятии, и внести предложения по усовершенствованию (если такие идеи есть). Напишите пожалуйста, всё-ли понятно по структуре.
+
+
+
+-- 1. Заменить в ключах длинные записи атрибутов на SERIAL.
+-- 2. Добавить в строки создания таблиц и БД конструкцию IF NOT EXISTS
+
+-- 3. Создать отдельную таблицу для стран.
+	
+-- Таблица стран
+CREATE TABLE IF NOT EXISTS countries (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название страны",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  pdated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Страны";   
+
+
+
+-- 4. Создать отдельную таблицу для городов.
+
+-- Таблица стран
+CREATE TABLE IF NOT EXISTS cities (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название города",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Города"; 
+
+
+
+-- 5. Создать отдельную таблицу для статусов.
+
+-- Таблица статусов пользователей
+CREATE TABLE IF NOT EXISTS user_status (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название статуса (уникально)",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Статусы пользователей"; 
+
+
+
+
+
+-- INSERT INTO user_statuses (name) VALUES ('single'),('married');
+-- ALTER TABLE profiles RENAME COLUMN status TO status_id;
+-- ALTER TABLE profiles MODIFY COLUMN status_id INT UNSIGNED;
+-- ALTER TABLE profiles RENAME COLUMN country TO country_id;
+-- ALTER TABLE profiles MODIFY COLUMN country_id INT UNSIGNED;
+
+-- ALTER TABLE media ADD COLUMN digest varchar(256) not null comment "SHA256 дайжест файла";
+
+
+
+2. Добавить необходимую таблицу/таблицы для того, чтобы можно было использовать лайки для медиафайлов, постов и пользователей.
+
+-- Таблица лайков
+CREATE TABLE IF NOT EXISTS messages (
+  id serial COMMENT "Идентификатор строки", 
+  from_user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на отправителя лайка",
+  to_recipient_id INT UNSIGNED NOT NULL COMMENT "Ссылка на получателя лайка",
+  created_at DATETIME NOT NULL DEFAULT NOW() COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Лайки";
+
+
+
+3. Используя сервис http://filldb.info или другой по вашему желанию, сгенерировать тестовые данные для всех таблиц, учитывая логику связей. 
+Для всех таблиц, где это имеет смысл, создать не менее 100 строк. Создать локально БД vk и загрузить в неё тестовые данные.
+
+Второй файл fulldb30-12-2020 23-03.sql содержит всю информацию о дампе.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Создаём таблицу пользователей
+CREATE TABLE users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  first_name VARCHAR(100) NOT NULL COMMENT "Имя пользователя",
+  last_name VARCHAR(100) NOT NULL COMMENT "Фамилия пользователя",
+  email VARCHAR(100) NOT NULL UNIQUE COMMENT "Почта",
+  phone VARCHAR(100) NOT NULL UNIQUE COMMENT "Телефон",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Пользователи";  
+
+
+-- Таблица профилей
+CREATE TABLE profiles (
+  user_id INT UNSIGNED NOT NULL PRIMARY KEY COMMENT "Ссылка на пользователя", 
+  gender CHAR(1) NOT NULL COMMENT "Пол",
+  birthday DATE COMMENT "Дата рождения",
+  photo_id INT UNSIGNED COMMENT "Ссылка на основную фотографию пользователя",
+  status_id INT COMMENT "Текущий статус",
+  city VARCHAR(130) COMMENT "Город проживания",
+  country_id INT COMMENT "Страна проживания",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Профили"; 
+
+
+-- Таблица дружбы
+CREATE TABLE friendship (
+  user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на инициатора дружеских отношений",
+  friend_id INT UNSIGNED NOT NULL COMMENT "Ссылка на получателя приглашения дружить",
+  status_id INT UNSIGNED NOT NULL COMMENT "Ссылка на статус (текущее состояние) отношений",
+  requested_at DATETIME DEFAULT NOW() COMMENT "Время отправления приглашения дружить",
+  confirmed_at DATETIME COMMENT "Время подтверждения приглашения",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки",  
+  PRIMARY KEY (user_id, friend_id) COMMENT "Составной первичный ключ"
+) COMMENT "Таблица дружбы";
+
+
+-- Таблица сообщений
+CREATE TABLE messages (
+  id serial COMMENT "Идентификатор строки", 
+  from_user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на отправителя сообщения",
+  to_user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на получателя сообщения",
+  body TEXT NOT NULL COMMENT "Текст сообщения",
+  is_important BOOLEAN COMMENT "Признак важности",
+  is_delivered BOOLEAN COMMENT "Признак доставки",
+  created_at DATETIME NOT NULL DEFAULT NOW() COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Сообщения";
+
+-- Таблица статусов дружеских отношений
+CREATE TABLE friendship_statuses (
+  id serial COMMENT "Идентификатор строки",
+  name VARCHAR(150) NOT NULL UNIQUE COMMENT "Название статуса",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"  
+) COMMENT "Статусы дружбы";
+
+-- Таблица групп
+CREATE TABLE communities (
+  id serial COMMENT "Идентификатор сроки",
+  name VARCHAR(150) NOT NULL UNIQUE COMMENT "Название группы",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"  
+) COMMENT "Группы";
+
+-- Таблица связи пользователей и групп
+CREATE TABLE communities_users (
+  community_id INT UNSIGNED NOT NULL COMMENT "Ссылка на группу",
+  user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на пользователя",
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки", 
+  PRIMARY KEY (community_id, user_id) COMMENT "Составной первичный ключ"
+) COMMENT "Участники групп, связь между пользователями и группами";
+
+
+-- Таблица медиафайлов
+CREATE TABLE media (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  filename VARCHAR(255) NOT NULL COMMENT "Путь к файлу",
+  digest varchar(256) not null comment "SHA256 дайжест файла",	
+  size INT NOT NULL COMMENT "Размер файла",
+  metadata JSON COMMENT "Метаданные файла",
+  media_type_id INT UNSIGNED NOT NULL COMMENT "Ссылка на тип контента",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Медиафайлы";
+
+-- Принадлежность файла пользователю
+CREATE TABLE users_media (
+  user_id INT UNSIGNED NOT NULL COMMENT "Ссылка на пользователя",
+  media_id INT UNSIGNED NOT NULL COMMENT "Ссылка на медиа-файл",
+  is_photo BOOLEAN NOT_NULL DEFAULT false "Данный файл является фотографией пользователя",	
+  PRIMARY KEY (user_id, media_id) COMMENT "Составной первичный ключ"
+) COMMENT "Принадлежность файла пользователю"
+
+-- Таблица типов медиафайлов
+CREATE TABLE media_types (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  name VARCHAR(255) NOT NULL UNIQUE COMMENT "Название типа",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Типы медиафайлов";
+
+
+CREATE TABLE countries (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название страны",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  pdated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Страны";  
+
+-- Таблица стран
+CREATE TABLE cities (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название города",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Города"; 
+
+-- Таблица статусов пользователей
+CREATE TABLE user_status (
+  id serial COMMENT "Идентификатор строки", 
+  name VARCHAR(100) NOT NULL COMMENT "Название статуса (уникально)",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Статусы пользователей"; 
