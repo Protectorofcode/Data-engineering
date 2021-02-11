@@ -1,0 +1,332 @@
+-- Описание
+-- Здесь представлена база данных Госпиталя. Таблица people содержит общую информацию о всех людях.
+-- Таблицы patient и epmloyee содержат информацию о работниках больницы и пациентах соответственно.
+-- В качестве работников больницы представлены doctor и nurse, у которых есть свои таблицы.
+-- Таблица визитов содержит информацию о приеме паицентов врачами и причинах визитов пациентов.
+-- У пациента есть своя медицинская карта, которая представлена таблицей medical_card. Там содержится история болезни пациента.
+-- Таблица disease содержит информацию о болезнях.
+-- В таблице prescription сожержится рецепт, который выписал доктор больному.
+-- Таблица drug содержит информацию о лекарствах.
+-- Таблица room содержит информацию о комнатах для больных.
+-- Таблица room_patient содержит информацию о том, какие пациенты лежат в каких комнатах.
+
+
+
+-- Создаем таблицы.
+
+
+-- Таблица людей
+CREATE TABLE people (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  first_name VARCHAR(100) NOT NULL COMMENT "Имя",
+  last_name VARCHAR(100) NOT NULL COMMENT "Фамилия",
+  sex VARCHAR(10) NOT NULL COMMENT "Пол",
+  phone VARCHAR(100) NOT NULL UNIQUE COMMENT "Телефон",
+  address VARCHAR(200) NOT NULL COMMENT "Адрес",
+  age INT UNSIGNED COMMENT "Возраст",
+  polis_number INT UNSIGNED NOT NULL UNIQUE COMMENT "Номер полиса",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Люди";  
+
+
+-- Таблица пациентов
+CREATE TABLE patient (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  admission_date DATETIME COMMENT "Время поступления в больницу",
+  discharge_date DATETIME COMMENT "Время выписки из больницы",
+  polis_number INT UNSIGNED NOT NULL UNIQUE COMMENT "Номер полиса",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Пациенты";  
+
+
+-- Таблица работников
+CREATE TABLE employee(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  start_date DATETIME COMMENT "Дата поступления на работу",
+  end_date DATETIME COMMENT "Дата увольнения",
+  polis_number INT UNSIGNED NOT NULL UNIQUE COMMENT "Номер полиса",
+  description TEXT NOT NULL COMMENT "Описание работника",
+  experience INT UNSIGNED COMMENT "Опыт работы в годах",
+  salary DECIMAL(6,2) NOT NULL COMMENT "Зарплата",
+  email VARCHAR(100) NOT NULL UNIQUE COMMENT "Почта",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Работники";  
+
+
+-- Таблица комнат
+CREATE TABLE room(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  room_floor INT UNSIGNED COMMENT "Этаж комнаты",
+  room_department VARCHAR(100) NOT NULL COMMENT "Отделение",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Комнаты";  
+
+
+-- Таблица комнат с пациентами
+CREATE TABLE room_patient(
+  room_id INT UNSIGNED COMMENT "ID комнаты", 
+  patient_id INT UNSIGNED COMMENT "ID пациента",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки"
+) COMMENT "Комнаты с пациентами";  
+
+
+-- Таблица докторов
+CREATE TABLE doctor(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  employee_id INT UNSIGNED NOT NULL UNIQUE COMMENT "ID работника",
+  speciality TEXT NOT NULL COMMENT "Специальность",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Докторы";  
+
+
+-- Таблица медсестер
+CREATE TABLE nurse(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки", 
+  employee_id INT UNSIGNED NOT NULL UNIQUE COMMENT "ID работника",
+  speciality TEXT NOT NULL COMMENT "Специальность",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Медсестры";  
+
+
+-- Таблица медицинской карточки пациента
+CREATE TABLE medical_card(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  patient_id INT UNSIGNED NOT NULL UNIQUE COMMENT "ID пациента",
+  allergy VARCHAR(100) NOT NULL COMMENT 'Есть ли аллергия у пациента',
+  past_illness VARCHAR(100) NOT NULL COMMENT 'Перенесенные заболевания пациента',
+  symptoms VARCHAR(100) NOT NULL COMMENT 'Симптоматика пациента',
+  disease_id INT UNSIGNED COMMENT "ID болезни",
+  diagnosis VARCHAR(100) NOT NULL COMMENT 'Диагноз пациента',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Карта пациента";  
+
+
+-- Таблица рецептов
+CREATE TABLE prescription(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  patient_id INT UNSIGNED NOT NULL UNIQUE COMMENT "ID пациента",
+  drug_id INT UNSIGNED NULL COMMENT "ID лекарства",
+  quantity INT UNSIGNED COMMENT "Количество", 
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Лекарства пациента";  
+
+
+-- Таблица лекарств
+CREATE TABLE drug(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  name VARCHAR(10) NOT NULL COMMENT "Название",
+  description TEXT NOT NULL COMMENT "Описание лекарства",
+  price INT UNSIGNED COMMENT "Цена",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Лекарства";  
+
+
+-- Таблица приемов
+CREATE TABLE visit(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  date_visit DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время визита",
+  patient_id INT UNSIGNED COMMENT "ID пациента",
+  employee_id INT UNSIGNED COMMENT "ID работника",
+  reason_for_visit TEXT NOT NULL COMMENT "Причина визита",
+  name VARCHAR(10) NOT NULL COMMENT "Имя пациента",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Лекарства";  
+
+
+-- Таблица болезней
+CREATE TABLE disease(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  name VARCHAR(10) NOT NULL COMMENT "Название",
+  description TEXT NOT NULL COMMENT "Описание болезни",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
+) COMMENT "Болезни";  
+
+
+-- Схема базы данных представлена в scheme.png
+
+
+
+-- Создаем все необходимые внешние ключи и диаграмму отношений.
+
+ALTER TABLE patient
+  ADD CONSTRAINT patient_polis_people_fk
+  FOREIGN KEY (polis_number) REFERENCES people(polis_number)
+  ON DELETE CASCADE;
+
+ALTER TABLE employee
+  ADD CONSTRAINT employee_polis_people_fk
+  FOREIGN KEY (polis_number) REFERENCES people(polis_number)
+  ON DELETE CASCADE;
+
+ALTER TABLE room_patient
+  ADD CONSTRAINT room_pat_id_fk
+  FOREIGN KEY (room_id) REFERENCES room(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE room_patient
+  ADD CONSTRAINT patient_room_id_fk
+  FOREIGN KEY (patient_id) REFERENCES patient(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE doctor
+  ADD CONSTRAINT doc_emp_id_fk
+  FOREIGN KEY (employee_id) REFERENCES employee(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE nurse
+  ADD CONSTRAINT nur_emp_id_fk
+  FOREIGN KEY (employee_id) REFERENCES employee(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE visit
+  ADD CONSTRAINT vis_emp_id_fk
+  FOREIGN KEY (employee_id) REFERENCES employee(id)
+  ON DELETE CASCADE,
+  ADD CONSTRAINT vis_pat_id_fk
+  FOREIGN KEY (patient_id) REFERENCES patient(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE medical_card
+  ADD CONSTRAINT medcard_pat_id_fk
+  FOREIGN KEY (patient_id) REFERENCES patient(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE prescription
+  ADD CONSTRAINT drugfor_pat_id_fk
+  FOREIGN KEY (patient_id) REFERENCES patient(id)
+  ON DELETE CASCADE;
+
+ALTER TABLE prescription
+   ADD CONSTRAINT drug_id_fk
+   FOREIGN KEY (drug_id) REFERENCES drug(id)
+   ON DELETE SET NULL;
+
+ALTER TABLE medical_card
+  ADD CONSTRAINT disease_id_fk 
+  FOREIGN KEY (disease_id) REFERENCES disease(id)
+  ON DELETE SET NULL;
+
+
+
+-- Создаем индексы
+
+-- Ищут людей по имени и фамилии
+CREATE INDEX first_last_name_idx ON people(first_name, last_name);
+
+-- Часто ищут людей по телефону или email
+CREATE INDEX people_phone_idx ON people(phone);
+
+-- Ищут работников по email
+CREATE INDEX employee_email_idx ON employee(email);
+
+-- Ищут пациентов по полису
+CREATE INDEX polis_patient_idx ON people(polis_number);
+
+-- Часто ищут название лекарства
+CREATE INDEX drug_name_idx ON drug(name);
+
+-- Часто ищут диагноз пациента
+CREATE INDEX diagnosis_pat_idx ON medical_card(diagnosis);
+
+-- Часто ищут название болезни
+CREATE INDEX disease_name_idx ON disease(name);
+
+
+
+
+-- Скрипт наполнения данными называется fulldb.sql
+
+
+
+
+-- SQL запросы для выборок данных
+
+-- Вывести доктора c id = 1
+SELECT people.first_name, people.last_name, d.speciality FROM people JOIN employee as e
+	ON e.polis_number = people.polis_number JOIN doctor as d ON d.employee_id = e.id 
+	WHERE d.id = 1;
+-- Ответ в query1
+
+
+-- Посчитать среднюю зарплату медсестер
+select AVG(employee.salary) as average_nurse_salary from employee 
+	join nurse as n on n.employee_id = employee.id 
+	group by n.speciality order by average_nurse_salary;
+
+
+-- Посчитать среднюю зарплату докторов
+select AVG(employee.salary) as average_doctor_salary from employee 
+	join doctor as d on d.employee_id = employee.id 
+	group by d.speciality order by average_doctor_salary desc;
+
+
+
+
+-- Создадим представления
+
+-- Выведем пациентов с диагнозами
+create or replace view patients_view(first_name, last_name, diagnosis) as 
+select people.first_name, people.last_name, md.diagnosis from people 
+join patient as p on p.polis_number = people.polis_number join medical_card
+as md on md.patient_id = p.id;
+
+select * from patients_view;
+
+
+-- Выведем пациентов с причинами визита
+create or replace view visits_view(first_name, last_name, reason) as 
+select people.first_name, people.last_name, v.reason_for_visit from people 
+join patient as p on p.polis_number = people.polis_number 
+join visit as v on v.patient_id = p.id;
+
+select * from visits_view;
+
+
+
+
+-- Создадим хранимые процедуры (функции) и тригеры
+
+
+-- Функция выводит должность специалиста взависимости от стажа
+DELIMITER //
+
+DROP FUNCTION IF EXISTS emp_exp//
+CREATE FUNCTION emp_exp(value INT) RETURNS TEXT DETERMINISTIC
+BEGIN	
+  RETURN CASE
+      WHEN value >= 1 AND value < 3 THEN "Начинающий специалист"
+      WHEN value >= 3  AND value < 5 THEN "Специалист"
+      WHEN value >= 5 AND value < 10 THEN "Старший специалист"
+      ELSE "Заведующий"
+    END;
+END //
+
+
+DELIMITER ;
+
+SELECT hospital.employee_exp(2);
+
+
+-- Тригер, предупреждающий о NULL значениях в обоих полях таблицы people
+DROP TRIGGER IF EXISTS trigger_1;
+delimiter //
+CREATE TRIGGER trigger_1 BEFORE INSERT ON people
+FOR EACH ROW
+BEGIN
+	IF(ISNULL(NEW.first_name) AND ISNULL(NEW.last_name)) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Trigger Warning! NULL in both fields!';
+	END IF;
+END //
+delimiter ;
+
