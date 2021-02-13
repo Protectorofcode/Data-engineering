@@ -332,6 +332,8 @@ DELIMITER ;
 SELECT hospital.employee_exp(2);
 
 
+
+
 -- Тригер, предупреждающий о NULL значениях в обоих полях таблицы people
 DROP TRIGGER IF EXISTS trigger_1;
 delimiter //
@@ -343,4 +345,27 @@ BEGIN
 	END IF;
 END //
 delimiter ;
+
+INSERT INTO people (first_name, last_Name, sex, phone, address, age, polis_number)
+VALUES (NULL, NULL, "f", 89215445654, "street 1, house 2", 23, 3453); 
+
+-- Ответ в trigger1
+
+-- Тригер, заполняющий NULL значение в в поле speciality таблицы doctor
+DROP TRIGGER IF EXISTS trigger_2;
+delimiter //
+CREATE TRIGGER trigger_2 BEFORE INSERT ON doctor
+FOR EACH ROW
+BEGIN
+	IF(ISNULL(NEW.speciality)) 
+		THEN SET NEW.speciality = 'Therapist';
+	END IF;
+END //
+
+INSERT INTO doctor (employee_id, speciality)
+VALUES (51, NULL); 
+
+select * from doctor where employee_id = 51
+
+-- Ответ в trigger2
 
