@@ -263,12 +263,26 @@ SELECT people.first_name, people.last_name, d.speciality FROM people JOIN employ
 select AVG(employee.salary) as average_nurse_salary from employee 
 	join nurse as n on n.employee_id = employee.id 
 	group by n.speciality order by average_nurse_salary;
+-- Ответ в query2
 
 
 -- Посчитать среднюю зарплату докторов
 select AVG(employee.salary) as average_doctor_salary from employee 
 	join doctor as d on d.employee_id = employee.id 
 	group by d.speciality order by average_doctor_salary desc;
+-- Ответ в query3
+
+
+-- Вывести количество визитов каждого доктора
+select first_name, last_name, count(v.id) as total_visits from visit v
+	join (select d.employee_id as idd, first_name, last_name, d.speciality from people join 
+	employee e on e.polis_number = people.polis_number join doctor d on d.employee_id = e.id) as subquery1 on 
+	subquery1.idd = v.employee_id 
+group by first_name, last_name
+order by total_visits;
+-- Ответ в query4
+
+
 
 
 
