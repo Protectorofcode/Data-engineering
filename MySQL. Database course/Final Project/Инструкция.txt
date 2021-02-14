@@ -371,3 +371,38 @@ select * from doctor where employee_id = 51
 
 -- Ответ в trigger2
 
+
+-- Создадим таблицу logs типа Archive. При каждом создании записи в таблицах doctor и nurse 
+-- в таблицу logs помещается время и дата создания записи, название таблицы, идентификатор первичного ключа и 
+-- содержимое поля description.
+
+CREATE TABLE logs (
+  table_name VARCHAR(20) NOT NULL,
+  id INT UNSIGNED NOT NULL,
+  description VARCHAR(255),
+  created_at DATETIME DEFAULT NOW()
+) ENGINE=ARCHIVE;
+
+CREATE TRIGGER doctor_log AFTER INSERT ON doctor FOR EACH ROW
+  INSERT INTO logs 
+    SET 
+      table_name = 'doctor',
+      id = NEW.id,
+      description = NEW.speciality;
+
+CREATE TRIGGER nurse_log AFTER INSERT ON nurse FOR EACH ROW
+  INSERT INTO logs 
+    SET 
+      table_name = 'nurse',
+      id = NEW.id,
+      description = NEW.speciality;
+
+INSERT INTO doctor (employee_id, speciality)
+VALUES (52, "Cardiolog");
+
+INSERT INTO nurse (employee_id, speciality)
+VALUES (51, "Head nurse");
+
+select * from logs
+
+-- Ответ в trigger3
