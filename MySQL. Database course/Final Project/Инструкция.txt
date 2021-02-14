@@ -12,8 +12,8 @@
 
 
 
--- Создаем таблицы.
 
+-- Создаем таблицы.
 
 -- Таблица людей
 CREATE TABLE people (
@@ -256,6 +256,7 @@ CREATE INDEX disease_name_idx ON disease(name);
 SELECT people.first_name, people.last_name, d.speciality FROM people JOIN employee as e
 	ON e.polis_number = people.polis_number JOIN doctor as d ON d.employee_id = e.id 
 	WHERE d.id = 1;
+
 -- Ответ в query1
 
 
@@ -263,6 +264,7 @@ SELECT people.first_name, people.last_name, d.speciality FROM people JOIN employ
 select AVG(employee.salary) as average_nurse_salary from employee 
 	join nurse as n on n.employee_id = employee.id 
 	group by n.speciality order by average_nurse_salary;
+
 -- Ответ в query2
 
 
@@ -270,6 +272,7 @@ select AVG(employee.salary) as average_nurse_salary from employee
 select AVG(employee.salary) as average_doctor_salary from employee 
 	join doctor as d on d.employee_id = employee.id 
 	group by d.speciality order by average_doctor_salary desc;
+
 -- Ответ в query3
 
 
@@ -280,6 +283,7 @@ select first_name, last_name, count(v.id) as total_visits from visit v
 	subquery1.idd = v.employee_id 
 group by first_name, last_name
 order by total_visits;
+
 -- Ответ в query4
 
 
@@ -297,6 +301,8 @@ as md on md.patient_id = p.id;
 
 select * from patients_view;
 
+-- Ответ в view1
+
 
 -- Выведем пациентов с причинами визита
 create or replace view visits_view(first_name, last_name, reason) as 
@@ -306,6 +312,7 @@ join visit as v on v.patient_id = p.id;
 
 select * from visits_view;
 
+-- Ответ в view2
 
 
 
@@ -333,6 +340,27 @@ SELECT hospital.emp_exp(2);
 
 -- Ответ в function1
 
+
+
+-- Процедура, который помещает в таблицу drug сто записей.
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS procedure_2//
+CREATE PROCEDURE procedure_2()
+BEGIN
+   DECLARE count INT DEFAULT 0;
+   WHILE count < 100 DO
+      SET count = count + 1;
+      INSERT INTO drug (name, description, price) VALUES
+        (CONCAT('Drug № ', count), CONCAT('Description for Drug № ', count), FLOOR(RAND()*(1000-10)+10));
+   END WHILE;
+END//
+
+
+call procedure_2();
+
+-- Ответ в function2
 
 
 
