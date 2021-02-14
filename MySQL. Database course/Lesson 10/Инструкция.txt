@@ -29,19 +29,26 @@ CREATE INDEX communities_idx ON communities(name);
 -- (общее количество пользователей в группе / всего пользователей в системе) * 100
 
 
-
+-- проверить эту функцию
 SELECT DISTINCT communities.name,
-	AVG(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) AS average,
-	MIN(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS min_1,
-	MAX(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS max_1,
-	COUNT(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) AS count_1,
-	COUNT(profiles.user_id) OVER() AS all_users,
-	SUM(communities_users.user_id) OVER(PARTITION BY communities_users.community_id) / SUM(profiles.user_id) OVER() * 100 AS "%%"
+	COUNT(communities_users.user_id) OVER() 
+	    / (SELECT COUNT(*) FROM communities) AS avg_users_in_groups, -- среднее количество пользователей в группах
+	FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) OVER w_community_birthday_desc AS youngest, -- самый молодой пользователь в группе
+        FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) OVER w_community_birthday_asc AS oldest, -- самый старший пользователь в группе
+	-- MIN(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS min_1,
+	-- MAX(YEAR(CURRENT_TIMESTAMP) - YEAR(profiles.birthday)) OVER(PARTITION BY communities_users.community_id) AS max_1,
+        COUNT(communities_users.user_id) OVER w_community AS users_in_group, -- общее количество пользователей в группе
+	(SELECT COUNT(*) FROM users) AS users_total, -- всего пользователей в системе
+	-- COUNT(profiles.user_id) OVER() AS all_users,
+	COUNT(communities_users.user_id) OVER w_community / (SELECT COUNT(*) FROM users) *100 AS '%%' -- отношение в процентах (общее количество пользователей в группе /  всего пользователей в системе) * 100
 	FROM communities
-      		JOIN communities_users
-        		ON communities.id = communities_users.community_id
-        	JOIN profiles
-        		ON communities_users.user_id = profiles.user_id;
+      		LEFT JOIN communities_users ON communities_users.community_id = communities.id
+      		LEFT JOIN users ON communities_users.user_id = users.id
+      		LEFT JOIN profiles ON profiles.user_id = users.id
+      		WINDOW w_community AS (PARTITION BY communities.id),
+             		w_community_birthday_desc AS (PARTITION BY communities.id ORDER BY profiles.birthday DESC),
+             		w_community_birthday_asc AS (PARTITION BY communities.id ORDER BY profiles.birthday);
+
 
 
 --Ответ показан в 2.png
