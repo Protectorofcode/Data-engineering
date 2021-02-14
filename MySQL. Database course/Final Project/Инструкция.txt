@@ -329,7 +329,9 @@ END //
 
 DELIMITER ;
 
-SELECT hospital.employee_exp(2);
+SELECT hospital.emp_exp(2);
+
+-- Ответ в function1
 
 
 
