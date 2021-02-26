@@ -15,25 +15,16 @@ class Stationary:
 
 
 class Pen(Stationary):
-    def __init__(self, title):
-        super().__init__(title)
-
     def draw(self):
         print(f'Запуск отрисовки {self.title}. Ручка четко делает отрисовку.')
 
 
 class Pencil(Stationary):
-    def __init__(self, title):
-        super().__init__(title)
-
     def draw(self):
         print(f'Запуск отрисовки {self.title}. Отрисовку карандашом можно стирать.')
 
 
 class Handle(Stationary):
-    def __init__(self, title):
-        super().__init__(title)
-
     def draw(self):
         print(f'Запуск отрисовки {self.title}. Маркер делает яркую и большую отрисовку.')
 

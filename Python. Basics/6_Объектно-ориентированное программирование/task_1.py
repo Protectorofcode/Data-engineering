@@ -5,31 +5,19 @@
 # Переключение между режимами должно осуществляться только в указанном порядке (красный, желтый, зеленый).
 # Проверить работу примера, создав экземпляр и вызвав описанный метод.
 
-import time
+from time import sleep
+from itertools import cycle
 
 
 class TrafficLight:
 
-    __colors = ['Красный', 'Желтый', 'Зеленый']
-    __color = None
-
     def __init__(self):
-        self.__color = self.__colors[0]
+        self.__colors = (('Red', 5), ('Yellow', 2), ('Green', 5))
 
     def running(self):
-        i=0
-        while i<3:
-            print(f'Цвет светофора: {self.__color}')
-            if i == 0:
-                time.sleep(7)
-                self.__color = self.__colors[1]
-            elif i == 1:
-                time.sleep(3)
-                self.__color = self.__colors[2]
-            elif i == 2:
-                time.sleep(7)
-                self.__color = self.__colors[0]
-            i += 1
+        for color, sec in cycle(self.__colors):
+            print(color, '(wait {} sec)'.format(sec))
+            sleep(sec)
 
 traffic_light = TrafficLight()
 traffic_light.running()

@@ -10,23 +10,21 @@
 
 class Worker:
 
-    def __init__(self, name, surname, position, wage, bonus):
+    def __init__(self, name, surname, position, income):
         self.name = name
         self.surname = surname
         self.position = position
-        self._income = {"wage": wage, "bonus": bonus}
+        self._income_wage = income["wage"]
+        self._income_bonus = income["bonus"]
 
 
 class Position(Worker):
-
-    def __init__(self, name, surname, position, wage, bonus):
-        super().__init__(name, surname, position, wage, bonus)
 
     def get_full_name(self):
         return self.name + " " + self.surname
 
     def get_total_income(self):
-        return str(self._income.get("wage")) + " " + str(self._income.get("bonus"))
+        return str(self._income_wage) + " " + str(self._income_bonus)
 
-person_worker = Position("Anastasia", "Eliseeva", "Manager", 60000, 3000)
+person_worker = Position("Anastasia", "Eliseeva", "Manager", {"wage": 60000, "bonus": 3000})
 print(person_worker.get_full_name(), person_worker.get_total_income())

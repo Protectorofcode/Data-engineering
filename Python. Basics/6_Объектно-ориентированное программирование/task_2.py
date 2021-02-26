@@ -6,17 +6,12 @@
 
 class Road:
 
-    _length = None
-    _width = None
-    weight = 0.025
-    thickness = 0.05
-
     def __init__(self, length, width):
         self._length = length
         self._width = width
 
     def calculate(self):
-        result = self._length * self._width * self.weight * self.thickness
+        result = self._length * self._width * 0.025 * 0.05
         print(f'Масса асфальта, необходимого для покрытия всего дорожного полотна: {result} т.')
 
 
