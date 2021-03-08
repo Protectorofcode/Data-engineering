@@ -4,7 +4,7 @@
 import requests
 import json
 
-url = 'https://samples.openweathermap.org/data/2.5/weather'
+url = 'https://api.openweathermap.org/data/2.5/weather'
 appid = '4dd959da2296390036054524230e8cd8'
 
 headers = {
@@ -12,7 +12,7 @@ headers = {
     'Authorization': appid
 }
 
-city = 'London'
+city = 'Kaliningrad'
 response = requests.get(f'{url}?q={city}&appid={appid}')
 
 if response.status_code == 200:
