@@ -16,14 +16,12 @@ city = 'Kaliningrad'
 response = requests.get(f'{url}?q={city}&appid={appid}')
 
 if response.status_code == 200:
-    print(response)
-
-response.json()
+    pprint(response)
 
 with open('data_1.json', 'w') as f:
-    json.dump(response.json(), f)
+    json.dump(response.json(), f, indent=2)
 
 for k in response.json().items():
-    print(k)
+    pprint(k)
 
 

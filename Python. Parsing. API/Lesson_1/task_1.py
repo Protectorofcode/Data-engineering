@@ -10,10 +10,10 @@ user='Protectorofcode'
 r = requests.get(f'{url}/users/{user}/repos')
 
 with open('data.json', 'w') as f:
-    json.dump(r.json(), f)
+    json.dump(r.json(), f, indent=2)
 
 for k in r.json():
-    print(k['name'])
+    pprint(k['name'])
 
 
 
