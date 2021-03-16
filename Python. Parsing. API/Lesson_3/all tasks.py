@@ -168,6 +168,11 @@ class ParserClass():
             html = requests.get('https://kaliningrad.hh.ru' + next_btn_link, headers=self.headers).text
             parsed_html = bs(html, 'lxml')
 
+
+
+
+
+
     # SuperJobe
     def parser_superjob(self, main_link, str_work):
 
@@ -186,7 +191,7 @@ class ParserClass():
                 last_page = int(page_block.find_all('a')[-2].getText())
 
         jobs = []
-        for page in range(0, last_page):
+        for page in range(0, last_page-1):
             jobs_list = parsed_html.find_all('div', {'class': 'f-test-vacancy-item'})
             for div in jobs_list:
                 job_dict = {}
@@ -266,7 +271,7 @@ class ParserClass():
                 last_page = int(page_block.find_all('a')[-2].getText())
 
         jobs = []
-        for page in range(0, last_page):
+        for page in range(0, last_page-1):
             jobs_list = parsed_html.find_all('div', {'class': 'f-test-vacancy-item'})
             for div in jobs_list:
                 job_dict = {}
@@ -339,5 +344,5 @@ vacancy_db.insert_new_job_hh('Java')
 
 # superjobe.ru
 vacancy_db.parser_superjob('https://russia.superjob.ru', 'Python')
-vacancy_db.print_salary_superjob(300000)
+vacancy_db.print_salary_superjob(100000)
 vacancy_db.insert_new_job_superjob('Java')
