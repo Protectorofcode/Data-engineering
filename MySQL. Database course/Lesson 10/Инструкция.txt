@@ -29,7 +29,6 @@ CREATE INDEX communities_idx ON communities(name);
 -- (общее количество пользователей в группе / всего пользователей в системе) * 100
 
 
--- проверить эту функцию
 SELECT DISTINCT communities.name,
 	COUNT(communities_users.user_id) OVER() 
 	    / (SELECT COUNT(*) FROM communities) AS avg_users_in_groups, -- среднее количество пользователей в группах
