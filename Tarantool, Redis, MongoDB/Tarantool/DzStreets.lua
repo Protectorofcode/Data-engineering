@@ -62,8 +62,8 @@ local function places(request)
     local limit = 1000
     local x = tonumber(request:param('x'))
     local y = tonumber(request:param('y'))
-    local rate = tonumber(request:param('rate'))
     local dist = tonumber(request:param('distance'))
+    local rate = tonumber(request:param('rate'))
 
     x = x or 1
     y = y or 1
